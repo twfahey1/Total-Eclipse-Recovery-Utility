@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import javax.swing.DefaultListModel;
 import java.util.*;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileSystemView;
 /**
  *
  * @author twfahey1
@@ -21,6 +23,12 @@ public class RecovJFrame extends javax.swing.JFrame {
      */
     public RecovJFrame() {
         initComponents();
+    }
+
+    public String GetMyDocuments() {
+     JFileChooser fr = new JFileChooser();
+     FileSystemView fw = fr.getFileSystemView();
+     return fw.getDefaultDirectory().toString();
     }
 
     /**
@@ -88,7 +96,7 @@ public class RecovJFrame extends javax.swing.JFrame {
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
         DefaultListModel dlm = new DefaultListModel();
-        List<String> usersOnThisPC = listFile("C:\\Users\\twfahey1\\Documents\\Eclipse", ".ini");
+        List<String> usersOnThisPC = listFile(GetMyDocuments() + "\\Eclipse", ".ini");
         for (String user : usersOnThisPC){
             dlm.addElement(user);
 

@@ -5,8 +5,7 @@
  */
 package total.eclipse.recovery.utility;
 
-import java.io.File;
-import java.io.FilenameFilter;
+import java.io.*;
 import javax.swing.DefaultListModel;
 import java.util.*;
 import javax.swing.JFileChooser;
@@ -43,6 +42,8 @@ public class RecovJFrame extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         userList = new javax.swing.JList<>();
         jButton1 = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        backupFolderList = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -60,6 +61,8 @@ public class RecovJFrame extends javax.swing.JFrame {
             }
         });
 
+        jScrollPane2.setViewportView(backupFolderList);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -70,18 +73,25 @@ public class RecovJFrame extends javax.swing.JFrame {
                         .addGap(39, 39, 39)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(96, 96, 96)
-                        .addComponent(jButton1)))
-                .addContainerGap(97, Short.MAX_VALUE))
+                        .addGap(58, 58, 58)
+                        .addComponent(jButton1)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 395, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(43, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(36, 36, 36)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jButton1)
-                .addContainerGap(93, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(32, 32, 32)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(82, 82, 82)
+                        .addComponent(jButton1)))
+                .addContainerGap(33, Short.MAX_VALUE))
         );
 
         pack();
@@ -103,7 +113,57 @@ public class RecovJFrame extends javax.swing.JFrame {
         }
         userList.setModel(dlm);
         
+        
+        DefaultListModel bkLM = new DefaultListModel();
+        List<String> backupFiles = listFile(System.getenv("SystemDrive") + "\\Eclipse Backups", "" );
+        List<String> backupNTFiles = listFile(System.getenv("SystemDrive") + "\\EclipseNT Backups", "" );
+        
+        for (String bkFile : backupFiles){
+            bkLM.addElement(bkFile);
+        }
+        for (String bkFile : backupNTFiles){
+            bkLM.addElement(bkFile);
+        }
+        backupFolderList.setModel(bkLM);
+        
+        
     }//GEN-LAST:event_formWindowOpened
+
+    
+    private List<String> readTXTfile(String fileName){
+        List<String>fileData = new ArrayList<String>();
+        String line = null;
+        
+        try {
+            // FileReader reads text files in the default encoding.
+            FileReader fileReader = 
+                new FileReader(fileName);
+
+            // Always wrap FileReader in BufferedReader.
+            BufferedReader bufferedReader = 
+                new BufferedReader(fileReader);
+
+            while((line = bufferedReader.readLine()) != null) {
+                fileData.add(line);
+            }   
+
+            // Always close files.
+            bufferedReader.close();         
+        }
+        catch(FileNotFoundException ex) {
+            System.out.println(
+                "Unable to open file '" + 
+                fileName + "'");                
+        }
+        catch(IOException ex) {
+            System.out.println(
+                "Error reading file '" 
+                + fileName + "'");                  
+            // Or we could just do this: 
+            // ex.printStackTrace();
+        }
+        return fileData;
+    }
 
     /**
      * @param args the command line arguments
@@ -184,8 +244,10 @@ public class RecovJFrame extends javax.swing.JFrame {
 		}
 	}
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JList<String> backupFolderList;
     private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JList<String> userList;
     // End of variables declaration//GEN-END:variables
 }

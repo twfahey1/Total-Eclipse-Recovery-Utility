@@ -6,17 +6,27 @@
 package total.eclipse.recovery.utility;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import java.text.SimpleDateFormat;
 import javax.swing.DefaultListModel;
 import java.util.*;
 import javax.swing.JFileChooser;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileSystemView;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.commons.io.FilenameUtils;
+
 /**
  *
  * @author twfahey1
  */
 public class RecovJFrame extends javax.swing.JFrame {
-
-    
     /**
      * Creates new form RecovJFrame
      */
@@ -43,7 +53,12 @@ public class RecovJFrame extends javax.swing.JFrame {
         userList = new javax.swing.JList<>();
         jButton1 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        backupFolderList = new javax.swing.JList<>();
+        dbList = new javax.swing.JList<>();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        ubList = new javax.swing.JList<>();
+        jButton2 = new javax.swing.JButton();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        iniReadList = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -52,16 +67,41 @@ public class RecovJFrame extends javax.swing.JFrame {
             }
         });
 
+        userList.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                userListMousePressed(evt);
+            }
+        });
+        userList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                userListValueChanged(evt);
+            }
+        });
         jScrollPane1.setViewportView(userList);
 
-        jButton1.setText("jButton1");
+        jButton1.setText("Recover Dictionary");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
-        jScrollPane2.setViewportView(backupFolderList);
+        dbList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        dbList.setName("dbList"); // NOI18N
+        jScrollPane2.setViewportView(dbList);
+
+        ubList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        ubList.setName("ubList"); // NOI18N
+        jScrollPane3.setViewportView(ubList);
+
+        jButton2.setText("Recover User Settings");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jScrollPane4.setViewportView(iniReadList);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -70,28 +110,38 @@ public class RecovJFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(39, 39, 39)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(52, 52, 52)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 696, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(58, 58, 58)
-                        .addComponent(jButton1)
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 395, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(43, Short.MAX_VALUE))
+                        .addGap(56, 56, 56)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane4)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane2)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(32, 32, 32)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(82, 82, 82)
-                        .addComponent(jButton1)))
-                .addContainerGap(33, Short.MAX_VALUE))
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         pack();
@@ -99,37 +149,137 @@ public class RecovJFrame extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        
-
+        try{
+            System.out.println(Paths.get(masterDBlist.get(dbList.getSelectedIndex())));
+            System.out.println(Paths.get(currentSelectedIniDixPath));
+            Files.copy(Paths.get(masterDBlist.get(dbList.getSelectedIndex())), Paths.get(currentSelectedIniDixPath), REPLACE_EXISTING);
+        }
+        catch (Exception e){
+            System.out.println(e.toString());
+        }
+        JOptionPane.showMessageDialog(null, "DB Restore Complete", "DB Restore", JOptionPane.INFORMATION_MESSAGE);
+ 
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private String getFileSize(String Filename){
+        File file = new File(Filename);
+        double bytes = file.length();
+        double kilobytes = (bytes / 1024);
+        return Objects.toString(round(kilobytes, 0)) + " kb";
+        
+    }
+    
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+    
+    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+    
+    private String getDateModified(String Filename){
+        File file = new File(Filename);
+        return sdf.format(file.lastModified());
+    }
+     private List<String> masterUserList = new ArrayList<String>();
+         DefaultListModel userLM = new DefaultListModel();
+     
+    String currentSelectedIniDixPath;
+    String currentSelectedIniJobPath;
+    String currentIniFilePath;
+    String dixName;
+    List<String> masterDBlist;
+    List<String> masterUBlist;
+    
+    //On window load, when program first starts, load our data
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
-        DefaultListModel dlm = new DefaultListModel();
-        List<String> usersOnThisPC = listFile(GetMyDocuments() + "\\Eclipse", ".ini");
-        for (String user : usersOnThisPC){
-            dlm.addElement(user);
+        
 
-        }
-        userList.setModel(dlm);
+        listFiles(GetMyDocuments() + "\\Eclipse", ".ini", masterUserList, userList, userLM);      
+        //listFiles(System.getenv("SystemDrive") + "\\Eclipse Backups", "db", masterDBlist, dbList, dbLM );
+        //listFiles(System.getenv("SystemDrive") + "\\EclipseNT Backups", "db", masterDBlist, dbList, dbLM );
+        //listFiles(System.getenv("SystemDrive") + "\\Eclipse Backups", "ub", masterUBlist, ubList, ubLM );
+        //listFiles(System.getenv("SystemDrive") + "\\EclipseNT Backups", "ub", masterUBlist, ubList, ubLM );       
         
-        
-        DefaultListModel bkLM = new DefaultListModel();
-        List<String> backupFiles = listFile(System.getenv("SystemDrive") + "\\Eclipse Backups", "" );
-        List<String> backupNTFiles = listFile(System.getenv("SystemDrive") + "\\EclipseNT Backups", "" );
-        
-        for (String bkFile : backupFiles){
-            bkLM.addElement(bkFile);
-        }
-        for (String bkFile : backupNTFiles){
-            bkLM.addElement(bkFile);
-        }
-        backupFolderList.setModel(bkLM);
         
         
     }//GEN-LAST:event_formWindowOpened
 
-    
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        try{
+            System.out.println(Paths.get(masterUBlist.get(ubList.getSelectedIndex())));
+            System.out.println(Paths.get(currentIniFilePath));
+            Files.copy(Paths.get(masterUBlist.get(ubList.getSelectedIndex())), Paths.get(currentIniFilePath), REPLACE_EXISTING);
+        }
+        catch (Exception e){
+            System.out.println(e.toString());
+        }
+        JOptionPane.showMessageDialog(null, "User Restore Complete", "UB Restore", JOptionPane.INFORMATION_MESSAGE);
+        
+        
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void userListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_userListValueChanged
+        
+    }//GEN-LAST:event_userListValueChanged
+
+    private void userListMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_userListMousePressed
+        
+
+        masterDBlist = new ArrayList<String>();
+        masterUBlist = new ArrayList<String>();
+        DefaultListModel dbLM = new DefaultListModel();
+        DefaultListModel ubLM = new DefaultListModel();
+        currentIniFilePath = masterUserList.get(userList.getSelectedIndex());
+        System.out.println("clicked");
+        
+        String fileSelected = masterUserList.get(userList.getSelectedIndex());
+        String userNameBase = FilenameUtils.getBaseName(fileSelected);
+        String dictionaryBaseName = "";
+
+        
+        List<String> iniSelected = readTXTfile(fileSelected);
+        DefaultListModel lm = new DefaultListModel();
+        for (String line : iniSelected){
+            if (line.startsWith("MainDictionary=")){
+                String[] splitLine = line.split("=");
+                String dictionaryName = splitLine[splitLine.length-1];
+                dixName = splitLine[splitLine.length-1];
+                lm.addElement("Main Dictionary = " + dictionaryName);
+                dictionaryBaseName = FilenameUtils.getBaseName(dictionaryName);
+                
+            }
+            if (line.contains("=JOB=")){
+                String[] splitLine = line.split("=");
+                String jobPath = splitLine[splitLine.length-1];
+                jobPath = jobPath.replace("{DOC}", GetMyDocuments()+"\\");
+                lm.addElement("Job Path = " + jobPath);
+                currentSelectedIniJobPath = jobPath;
+            
+            }
+            
+            
+            currentSelectedIniDixPath = currentSelectedIniJobPath + "\\" + dixName;
+
+            
+            //lm.addElement(line);
+            //System.out.println(line);
+        }
+        iniReadList.setModel(lm);
+        listFiles(System.getenv("SystemDrive") + "\\Eclipse Backups", dictionaryBaseName+".db", masterDBlist, dbList, dbLM );
+        //
+        listFiles(System.getenv("SystemDrive") + "\\Eclipse Backups", userNameBase+".ub", masterUBlist, ubList, ubLM );
+        listFiles(System.getenv("SystemDrive") + "\\EclipseNT Backups", userNameBase+".ub", masterUBlist, ubList, ubLM );  
+        listFiles(System.getenv("SystemDrive") + "\\EclipseNT Backups", "db", masterDBlist, dbList, dbLM );
+        
+    }//GEN-LAST:event_userListMousePressed
+
+    //Can return a list of all the lines in a text, useful for parsing
+    //ini file to get values
     private List<String> readTXTfile(String fileName){
         List<String>fileData = new ArrayList<String>();
         String line = null;
@@ -201,53 +351,64 @@ public class RecovJFrame extends javax.swing.JFrame {
         });
     }
 
-    public List<String> listFile(String folder, String ext) {
-                List<String> resultList = new ArrayList<String>();
-		GenericExtFilter filter = new GenericExtFilter(ext);
+    public void listFiles(String folder, String ext, List<String> masterList, JList listToAddTo, DefaultListModel bkLM) {
+        List<String> resultList = new ArrayList<String>();
+        FileFilter filter = new WildcardFileFilter("*"+ext+"*");
+        File dir = new File(folder);
 
-		File dir = new File(folder);
-		
-		if(dir.isDirectory()==false){
-			resultList.add("Directory does not exists : " + folder);
-			return resultList;
-		}
-		
-		// list out all the file name and filter by the extension
-		String[] list = dir.list(filter);
+        if(dir.isDirectory()==false){
+                resultList.add("Directory does not exists : " + folder);
 
-		if (list.length == 0) {
-			resultList.add("no files end with : " + ext);
-			return resultList;
-		}
+        }
+        // list out all the file name and filter by the extension
+        File[] list = dir.listFiles(filter);
 
-		for (String file : list) {
-			/*This gets the whole file name path:
-                        String temp = new StringBuffer(folder).append(File.separator)
-					.append(file).toString();
-                        */ 
-			resultList.add(file);
-		}
-                return resultList;
-	}       
+        if (list.length == 0) {
+                resultList.add("no files end with : " + ext);
+        }
 
-	// inner class, generic extension filter
-	public class GenericExtFilter implements FilenameFilter {
+        for (File file : list) {
+                /*This gets the whole file name path: */ 
+                String temp = new StringBuffer(folder).append(File.separator)
+                                .append(file).toString();
+                
+                String filePath = file.getAbsolutePath();
+                String basename = FilenameUtils.getBaseName(filePath);
+                String nameWextension = FilenameUtils.getName(filePath);
+                resultList.add(nameWextension + " - " + getFileSize(filePath) + " - " + getDateModified(filePath));
+                masterList.add(filePath);
+        }
 
-		private String ext;
+        for (String bkFile : resultList){
+            bkLM.addElement(bkFile);
+        }
+        
+        listToAddTo.setModel(bkLM);
+    }       
 
-		public GenericExtFilter(String ext) {
-			this.ext = ext;
-		}
+    // inner class, generic extension filter
+    public class GenericExtFilter implements FilenameFilter {
 
-		public boolean accept(File dir, String name) {
-			return (name.endsWith(ext));
-		}
-	}
+            private String ext;
+
+            public GenericExtFilter(String ext) {
+                    this.ext = ext;
+            }
+
+            public boolean accept(File dir, String name) {
+                    return (name.endsWith(ext));
+            }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JList<String> backupFolderList;
+    private javax.swing.JList<String> dbList;
+    private javax.swing.JList<String> iniReadList;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JList<String> ubList;
     private javax.swing.JList<String> userList;
     // End of variables declaration//GEN-END:variables
 }
